@@ -1,4 +1,0 @@
-django>=1.8,<1.9
-django-debug-toolbar==1.5
-gunicorn==19.4.5
-whitenoise==3.0
