@@ -1,5 +1,5 @@
 import web
-import fetch
+# import fetch
 import threading
 
 urls = (
