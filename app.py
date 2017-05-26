@@ -1,5 +1,5 @@
 import web
-# import fetch
+import fetch
 import threading
 
 urls = (
@@ -8,8 +8,8 @@ urls = (
 
 class index:
     def GET(self):
-    	# thread = threading.Thread(target=fetch.fetch,args=(web.input().id,))
-    	# thread.start()
+    	thread = threading.Thread(target=fetch.fetch,args=(web.input().id,))
+    	thread.start()
         return "start fetch"
 
 if __name__ == "__main__":
