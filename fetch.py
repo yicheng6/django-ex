@@ -28,10 +28,11 @@ def crawl(key=None):
 		url = 'https://api.douban.com/v2/book/%s?alt=json&apikey=08f332d3675ca9d71ad9987a3615fd85'%key
 
 		print 'test:%s'%key
+		print 'test2:http://%s/fetch-api1/status?id=%s'%(host,key)
 		request_status = urllib2.Request('http://%s/fetch-api1/status?id=%s'%(host,key))
 		response_status = urllib2.urlopen(request_status)
 		result_status = json.loads(response_status.read())
-		print 'test2:%s'%result_status['result']
+		print 'test3:%s'%result_status['result']
 		if not result_status['result']:
 			return False
 
