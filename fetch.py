@@ -4,13 +4,15 @@ import json
 import time
 import MySQLdb
 import helper
+import database
 from random import choice
 
 import sys
 reload(sys)
 sys.setdefaultencoding( "utf-8" )
 
-db=MySQLdb.connect(host='',port=,user='',passwd='',db='',charset="utf8")
+config = database.config()
+db=MySQLdb.connect(host=config['HOST'],port=int(config['PORT']),user=config['USER'],passwd=config['PASSWD'],db=config['DB'],charset="utf8")
 cursor = db.cursor()
 sleepTimes = [0.8,0.9,1,1.1,1.2,1.3,1.4,1.5,1.6]
 headers = { 'User-Agent' : 'Baiduspider' }
@@ -34,7 +36,7 @@ def crawl(key=None):
 	global db
 	global cursor
 	if db == None:
-		db=MySQLdb.connect(host='',port=,user='',passwd='',db='',charset="utf8")
+		db=MySQLdb.connect(host=config['HOST'],port=int(config['PORT']),user=config['USER'],passwd=config['PASSWD'],db=config['DB'],charset="utf8")
 		cursor = db.cursor()
 	else:
 		db.ping(True)
