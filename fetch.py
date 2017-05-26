@@ -2,24 +2,19 @@ import urllib
 import urllib2
 import json
 import time
-import MySQLdb
+import os
 import helper
-import database
 from random import choice
 
 import sys
 reload(sys)
 sys.setdefaultencoding( "utf-8" )
 
-config = database.config()
-db=MySQLdb.connect(host=config['HOST'],port=int(config['PORT']),user=config['USER'],passwd=config['PASSWD'],db=config['DB'],charset="utf8")
-cursor = db.cursor()
-sleepTimes = [0.8,0.9,1,1.1,1.2,1.3,1.4,1.5,1.6]
+host = os.getenv('MANAGE_HOST')
+sleepTimes = [0.8,0.9,1,1.1,1.2,1.3,1.4,1.5,1.6,2,2.5]
 headers = { 'User-Agent' : 'Baiduspider' }
 bids = helper.gen_bids()
 def fetch(id=''):
-	global db
-	global cursor
 	key = long(id)
 	while True:
 		if not crawl(key):
@@ -27,26 +22,15 @@ def fetch(id=''):
 			break
 		key = key - 1
 	print 'finish:%s'%key
-	cursor.close()
-	db.close()
-	cursor = None
-	db = None
 
 def crawl(key=None):
-	global db
-	global cursor
-	if db == None:
-		db=MySQLdb.connect(host=config['HOST'],port=int(config['PORT']),user=config['USER'],passwd=config['PASSWD'],db=config['DB'],charset="utf8")
-		cursor = db.cursor()
-	else:
-		db.ping(True)
 	try:
 		url = 'https://api.douban.com/v2/book/%s?alt=json&apikey=08f332d3675ca9d71ad9987a3615fd85'%key
 
-		sql0 = 'update douban_status set small=%s where small>min'%key   
-		n = cursor.execute(sql0)
-		cursor.execute("COMMIT")
-		if n != 1:
+		request_status = urllib2.Request('http://%s/fetch-api1/status?id=%s'%(host,key))
+		response_status = urllib2.urlopen(request_status)
+		result_status = json.loads(response_status.read())
+		if not result_status['result']:
 			return False
 
 		headers["Cookie"] = 'bid="%s"' % choice(bids)
@@ -78,21 +62,12 @@ def crawl(key=None):
 				tagStrs = []
 				for tag in tags:
 					tagStrs.append(tag['name'])
-				print '%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s\n'%(id,title,','.join(author),isbn,publisher,pubdate,','.join(tagStrs),image,summary,price,average)
-				sql = "insert ignore into douban_book(id,title,author,isbn,publisher,pubdate,tags,image,summary,price,average) values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"   
-				param = (id,title,','.join(author),isbn,publisher,pubdate,','.join(tagStrs),image,summary,price,average)    
-				n = cursor.execute(sql,param)
-				cursor.execute("COMMIT")
+				request_record = urllib2.Request('http://%s/fetch-api1/douban?id=%s&title=%s&author=%s&isbn=%s&publisher=%s&pubdate=%s&tags=%s&image=%s&summary=%s&price=%s&average=%s'%(host,id,title,','.join(author),isbn,publisher,pubdate,','.join(tagStrs),image,summary,price,average))
+				response_record = urllib2.urlopen(request_status)
 		else:
 			print 'msg:%s\n'%(msg)
 	except urllib2.URLError, e:
 	    if hasattr(e,"code"):
 	        print e.code
-	    else:
-	    	print str(e)
-	    	time.sleep(900)
-	except Exception, e:
-		print str(e)
-		time.sleep(900)
 	time.sleep(choice(sleepTimes))
 	return True
