@@ -8,9 +8,9 @@ urls = (
 
 class index:
     def GET(self):
-    	# thread = threading.Thread(target=fetch.fetch,args=(web.input().id,))
-    	# thread.start()
-    	fetch.fetch(web.input().id)
+    	thread = threading.Thread(target=fetch.fetch,args=(web.input().id,))
+    	thread.start()
+    	# fetch.fetch(web.input().id)
         return "start fetch"
 
 if __name__ == "__main__":
