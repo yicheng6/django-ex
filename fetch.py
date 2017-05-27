@@ -11,7 +11,7 @@ reload(sys)
 sys.setdefaultencoding( "utf-8" )
 
 host = os.getenv('MANAGE_HOST')
-sleepTimes = [0.8,0.9,1,1.1,1.2,1.3,1.4,1.5,1.6]
+sleepTimes = [0.7,0.1,0.2,0.3,0.4,0.5,0.6]
 headers = { 'User-Agent' : 'Baiduspider' }
 bids = helper.gen_bids()
 def fetch(id=''):
