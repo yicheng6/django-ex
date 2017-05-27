@@ -11,7 +11,7 @@ reload(sys)
 sys.setdefaultencoding( "utf-8" )
 
 host = os.getenv('MANAGE_HOST')
-sleepTimes = [0.8,0.9,1,1.1,1.2,1.3,1.4,1.5,1.6,2,2.5]
+sleepTimes = [0.8,0.9,1,1.1,1.2,1.3,1.4,1.5,1.6]
 headers = { 'User-Agent' : 'Baiduspider' }
 bids = helper.gen_bids()
 def fetch(id=''):
@@ -27,12 +27,9 @@ def crawl(key=None):
 	try:
 		url = 'https://api.douban.com/v2/book/%s?alt=json&apikey=08f332d3675ca9d71ad9987a3615fd85'%key
 
-		print 'test:%s'%key
-		print 'test2:http://%s/fetch-api1/status?id=%s'%(host,key)
 		request_status = urllib2.Request('http://%s/fetch-api1/status?id=%s'%(host,key))
 		response_status = urllib2.urlopen(request_status)
 		result_status = json.loads(response_status.read())
-		print 'test3:%s'%result_status['result']
 		if not result_status['result']:
 			return False
 
@@ -65,12 +62,17 @@ def crawl(key=None):
 				tagStrs = []
 				for tag in tags:
 					tagStrs.append(tag['name'])
-				request_record = urllib2.Request('http://%s/fetch-api1/douban?id=%s&title=%s&author=%s&isbn=%s&publisher=%s&pubdate=%s&tags=%s&image=%s&summary=%s&price=%s&average=%s'%(host,id,title,','.join(author),isbn,publisher,pubdate,','.join(tagStrs),image,summary,price,average))
-				response_record = urllib2.urlopen(request_status)
+				print '%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s\n'%(id,title,','.join(author),isbn,publisher,pubdate,','.join(tagStrs),image,summary,price,average)
+				record_url = 'http://%s/fetch-api1/douban'%host
+				record_values = {'id':id,'title':title,'author':','.join(author),'isbn':isbn,'publisher':publisher,'pubdate':pubdate,'tags':','.join(tagStrs),'image':image,'summary':summary,'price':price,'average':average}
+				record_data = urllib.urlencode(record_values)
+				response_record = urllib.urlopen('%s?%s'%(record_url,record_data))
 		else:
 			print 'msg:%s\n'%(msg)
 	except urllib2.URLError, e:
 	    if hasattr(e,"code"):
 	        print e.code
+	    else:
+	    	raise e
 	time.sleep(choice(sleepTimes))
 	return True
